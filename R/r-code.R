@@ -3,3 +3,4 @@
 # Load packages
 library(tidyverse)
 print("I loaded tidyverse!")
+print("Woohoo!")
