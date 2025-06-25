@@ -1,6 +1,8 @@
 ### This is a demo file with R code ###
 
+#-------------------------------------------------------------------------------
 # Load packages
+#-------------------------------------------------------------------------------
 library(tidyverse)
 library(palmerpenguins)
 library(wesanderson)
@@ -9,25 +11,35 @@ library(officer)
 library(flextable)
 
 
+#-------------------------------------------------------------------------------
 # Load paths
+#-------------------------------------------------------------------------------
 source("R/paths.R")
 
 
+#-------------------------------------------------------------------------------
 # Read data
+#-------------------------------------------------------------------------------
 df_penguins <- read_delim(paths$df_penguins, delim = ";", locale = locale(decimal_mark = "."))
 
 
+#-------------------------------------------------------------------------------
 # Check out data
+#-------------------------------------------------------------------------------
 summary(df_penguins)
 str(df_penguins)
 glimpse(df_penguins) #view the first few rows
 
 
+#-------------------------------------------------------------------------------
 # Clean data
+#-------------------------------------------------------------------------------
 df_penguins_clean <- df_penguins %>% drop_na()
 
 
+#-------------------------------------------------------------------------------
 # Summary statistics
+#-------------------------------------------------------------------------------
 ## Calculate summary statistics by species
 summary_statistics <- df_penguins_clean %>%
   group_by(species) %>%
@@ -48,7 +60,9 @@ write.table(summary_statistics,
             row.names = FALSE)    #exclude row names
 
 
+#-------------------------------------------------------------------------------
 # Bill length vs. flipper length
+#-------------------------------------------------------------------------------
 ## Create scatter plot of bill length vs. flipper length
 wes_palette("Zissou1")
 zissou_colors <- wes_palette("Zissou1", n = 5)
@@ -67,7 +81,9 @@ plot(plot_bill_flipper)
 ggsave(file.path(paths$outdir, "PENG_plot_bill_flipper_v01.pdf"), plot_bill_flipper)
 
 
+#-------------------------------------------------------------------------------
 # Body mass by species and sex
+#-------------------------------------------------------------------------------
 ## Create boxplot of body mass by species and sex
 colors2 <- c(zissou_colors[1], zissou_colors[5])
 
@@ -84,7 +100,9 @@ plot(plot_mass_species_sex)
 ggsave(file.path(paths$outdir, "PENG_plot_mass_species_sex_v01.pdf"), plot_mass_species_sex)
 
 
+#-------------------------------------------------------------------------------
 # Predict whether a penguin is an Adelie species or not based on flipper length and bill length
+#-------------------------------------------------------------------------------
 ## Create a binary outcome: is the species Adelie?
 df_penguins_clean <- df_penguins_clean %>%
   mutate(is_adelie = ifelse(species == "Adelie", 1, 0))
@@ -108,12 +126,12 @@ model_table_adelie
 ## Convert to flextable
 ft_adelie <- as_flex_table(model_table_adelie)
 
-# Create Word document
+## Create Word document
 doc_adelie <- read_docx() %>%
   body_add_par("Logistic regression model for Adelie penguins", style = "heading 1") %>%
   body_add_flextable(ft_adelie)
 
-# Save to Word
+## Save to Word
 print(doc_adelie, target = file.path(paths$outdir, "PENG_log_reg_adelie_v01.docx"))
 
-
+gc()
